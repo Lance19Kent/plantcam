@@ -40,7 +40,7 @@
             background: #ffffff;
             display: grid;
             place-items: center;
-            padding: 20px;
+            padding: 16px;
             position: relative;
             overflow: hidden;
             isolation: isolate;
@@ -50,8 +50,8 @@
             content: "";
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(9px);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(12px);
             pointer-events: none;
             z-index: 1;
         }
@@ -78,44 +78,105 @@
         }
 
         .scan-wrap {
-            width: min(100%, 520px);
+            width: min(100%, 420px);
             margin: 0;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid rgba(188, 203, 184, 0.55);
-            padding: 18px;
-            box-shadow: 0 20px 44px rgba(19, 30, 20, 0.08);
+            border-radius: 32px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(188, 203, 184, 0.5);
+            padding: 24px 20px 18px;
+            box-shadow: 0 18px 42px rgba(19, 30, 20, 0.1);
             position: relative;
             z-index: 2;
+            text-align: center;
         }
 
         .scan-headline {
-            margin: 2px 0 2px;
-            font-size: 1.45rem;
+            margin: 0 0 20px;
+            font-size: 1.5rem;
             line-height: 1.25;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .scan-subtitle {
-            margin: 0;
+            margin: 0 0 14px;
             color: var(--color-on-surface-variant);
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             line-height: 1.45;
         }
 
+        .loading-status {
+            margin: 16px 0 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading-ring {
+            width: 48px;
+            height: 48px;
+            position: relative;
+            display: grid;
+            place-items: center;
+        }
+
+        .loading-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .loading-ring-track {
+            fill: none;
+            stroke: rgba(188, 203, 184, 0.55);
+            stroke-width: 4;
+        }
+
+        .loading-ring-active {
+            fill: none;
+            stroke: #006e28;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 126;
+            stroke-dashoffset: 64;
+            animation: loadingRotate 2s linear infinite;
+            transform-origin: center;
+        }
+
+        .loading-stars {
+            position: absolute;
+            font-size: 1rem;
+            color: #006e28;
+            line-height: 1;
+        }
+
+        .loading-caption {
+            margin: 0;
+            font-size: 0.92rem;
+            color: #131e14;
+            font-weight: 600;
+        }
+
+        @keyframes loadingRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .scan-card {
-            margin-top: 14px;
-            border-radius: 18px;
+            margin-top: 6px;
+            border-radius: 22px;
             overflow: hidden;
             border: 1px solid rgba(188, 203, 184, 0.45);
             background: var(--color-surface-low);
             position: relative;
             width: 100%;
-            max-width: min(100%, 460px);
-            aspect-ratio: 4 / 5;
+            max-width: 320px;
+            aspect-ratio: 1 / 1;
             margin-left: auto;
             margin-right: auto;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
         }
 
         .scan-card.is-placeholder {
@@ -153,7 +214,7 @@
         .scan-dim {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(19, 30, 20, 0.22), rgba(19, 30, 20, 0.06));
+            background: linear-gradient(to top, rgba(19, 30, 20, 0.2), rgba(19, 30, 20, 0.05));
         }
 
         .scan-line {
@@ -164,6 +225,49 @@
             background: linear-gradient(to right, rgba(52, 199, 89, 0.1), rgba(52, 199, 89, 0.9), rgba(52, 199, 89, 0.1));
             box-shadow: 0 0 24px rgba(52, 199, 89, 0.65);
             animation: scanMove 2.1s ease-in-out infinite;
+        }
+
+        .scan-corner {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+
+        }
+
+        .scan-corner-tl {
+            top: 16px;
+            left: 16px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+            border-top-left-radius: 10px;
+            border-color: white;
+        }
+
+        .scan-corner-tr {
+            top: 16px;
+            right: 16px;
+            border-top: 2px solid;
+            border-right: 2px solid;
+            border-top-right-radius: 10px;
+            border-color: white;
+        }
+
+        .scan-corner-bl {
+            bottom: 16px;
+            left: 16px;
+            border-bottom: 2px solid;
+            border-left: 2px solid;
+            border-bottom-left-radius: 10px;
+            border-color: white;
+        }
+
+        .scan-corner-br {
+            bottom: 16px;
+            right: 16px;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+            border-bottom-right-radius: 10px;
+            border-color: white;
         }
 
         .scan-line.is-stopped {
@@ -192,17 +296,20 @@
         }
 
         .scan-meta {
-            margin-top: 14px;
+            margin-top: 16px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 8px;
+            flex-direction: column;
         }
 
         .scan-status {
             margin: 0;
-            font-size: 0.92rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
         }
 
         .scan-status[data-tone="info"] {
@@ -218,21 +325,36 @@
         }
 
         .scan-percent {
-            margin: 0;
+            margin: 8px 0 10px;
             min-width: 56px;
-            text-align: right;
-            font-size: 1.1rem;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
             font-weight: 800;
             color: var(--color-primary);
+            display: none;
+        }
+
+        .scan-percent-kicker {
+            margin: 8px 0 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4d5b4b;
+            font-weight: 700;
+            width: 100%;
+            text-align: center;
+            display: none;
         }
 
         .progress-track {
-            margin-top: 8px;
+            margin-top: 6px;
             width: 100%;
             height: 9px;
             border-radius: 999px;
             background: var(--color-surface-high);
             overflow: hidden;
+            display: none;
         }
 
         .progress-fill {
@@ -244,15 +366,25 @@
         }
 
         .retry-btn {
-            margin-top: 14px;
+            font-size: 1.1rem;
+            margin-top: 8px;
             width: 100%;
             border: 0;
-            height: 48px;
-            border-radius: 999px;
-            background: #eef7ec;
-            color: var(--color-primary);
-            font-weight: 700;
+            height: 52px;
+            border-radius: 16px;
+            background: transparent;
+            color: #006e28;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .retry-btn:active {
+            transform: scale(0.99);
+        }
+
+        .retry-btn:hover {
+            background: #eaf7e7;
         }
     </style>
 </head>
@@ -261,31 +393,47 @@
     <div id="focusBackdrop" class="focus-backdrop" aria-hidden="true"></div>
 
     <main class="scan-wrap">
-        <h1 class="scan-headline">Scanning Plant</h1>
-        <p class="scan-subtitle">Hold on while PlantCam analyzes your captured image.</p>
+        <h1 class="scan-headline">Analyzing Plant...</h1>
 
         <section id="scanCard" class="scan-card is-placeholder" data-tone="info">
             <img id="capturedPreview" alt="Captured plant image" src="hero-leaf.jpg" />
             <div class="scan-dim"></div>
             <div id="scanLine" class="scan-line"></div>
+            <div class="scan-corner scan-corner-tl"></div>
+            <div class="scan-corner scan-corner-tr"></div>
+            <div class="scan-corner scan-corner-bl"></div>
+            <div class="scan-corner scan-corner-br"></div>
         </section>
 
         <div class="scan-meta">
             <p id="scanStatus" class="scan-status" data-tone="info">Preparing image...</p>
-            <p id="scanPercent" class="scan-percent">0%</p>
         </div>
 
-        <div class="progress-track">
+        <div class="progress-track" aria-hidden="true">
             <div id="scanProgressBar" class="progress-fill"></div>
         </div>
 
-        <button id="retryBtn" class="retry-btn" type="button" hidden>Back to Home</button>
+        <p class="scan-percent-kicker" aria-hidden="true">Scanning Progress</p>
+        <p id="scanPercent" class="scan-percent" aria-hidden="true">0%</p>
+
+        <div class="loading-status" aria-hidden="true">
+            <div class="loading-ring">
+                <svg viewBox="0 0 48 48">
+                    <circle class="loading-ring-track" cx="24" cy="24" r="20"></circle>
+                    <circle class="loading-ring-active" cx="24" cy="24" r="20"></circle>
+                </svg>
+                <span class="loading-stars">✦</span>
+            </div>
+            <p class="loading-caption">Identifying diseases...</p>
+        </div>
+
+        <button id="retryBtn" class="retry-btn" type="button">Cancel</button>
     </main>
 
     <script>
         (function () {
             var MODEL_URL_BASE = 'https://teachablemachine.withgoogle.com/models/WdNoAAoXa/';
-            var INITIAL_PREVIEW_IMAGE = 'hero-leaf.jpg';
+            var INITIAL_PREVIEW_IMAGE = 'scanning-img.png';
             var preview = document.getElementById('capturedPreview');
             var scanStatus = document.getElementById('scanStatus');
             var scanPercent = document.getElementById('scanPercent');
