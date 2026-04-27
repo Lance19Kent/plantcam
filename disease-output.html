@@ -13,6 +13,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
+    <script src="plant-data.js"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -447,6 +448,46 @@
             justify-content: center;
         }
 
+        .recommendation-source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin-bottom: 8px;
+            border: 1px solid #bccbb8;
+            background: #f4f8f4;
+            color: #2f6a15;
+        }
+
+        .recommendation-source-badge.is-gemini {
+            background: #eaf7e7;
+            color: #0c5b22;
+            border-color: #8fd8a0;
+        }
+
+        .recommendation-source-badge.is-fallback {
+            background: #fff7e8;
+            color: #935c00;
+            border-color: #f2c27a;
+        }
+
+        .recommendation-source-badge.is-loading {
+            background: #f2f5f2;
+            color: #566356;
+            border-color: #c6d2c5;
+        }
+
+        .recommendation-source-details {
+            margin: 0 0 10px;
+            color: #566356;
+            font-size: 0.75rem;
+            line-height: 1.35;
+        }
+
         #resultHeroImage {
             width: 100%;
             height: 100%;
@@ -518,15 +559,16 @@
         <section class="px-6 mt-8">
             <div class="bg-surface-container-lowest rounded-2xl p-6 botanical-shadow border border-outline-variant/15">
                 <p class="text-sm font-label text-zinc-500 uppercase tracking-wider mb-6">Diagnosis Confidence</p>
+
                 <div class="space-y-6">
                     <!-- Powdery Mildew (Primary) -->
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <span class="font-bold text-on-surface">Powdery Mildew</span>
-                            <span class="text-sm font-bold text-red-500">92%</span>
+                            <span id="primaryDiseaseName" class="font-bold text-on-surface">Powdery Mildew</span>
+                            <span id="primaryDiseasePercent" class="text-sm font-bold text-red-500">92%</span>
                         </div>
                         <div class="h-2 w-full rounded-full overflow-hidden bg-red-100">
-                            <div class="h-full rounded-full bg-red-500" style="width: 92%"></div>
+                            <div id="primaryDiseaseBar" class="h-full rounded-full bg-red-500" style="width: 92%"></div>
                         </div>
                     </div>
                     <!-- Early Blight -->
@@ -551,8 +593,19 @@
                     </div>
                 </div>
                 <div class="mt-6 flex items-center gap-3 p-3 bg-surface-container rounded-xl">
-                    <span class="material-symbols-outlined text-tertiary" data-icon="warning">warning</span>
-                    <p class="text-sm text-on-surface font-medium">Powdery Mildew confirmed with high confidence.</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill=red>
+                        <path
+                            d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm330.5-51.5Q520-263 520-280t-11.5-28.5Q497-320 480-320t-28.5 11.5Q440-297 440-280t11.5 28.5Q463-240 480-240t28.5-11.5ZM440-360h80v-200h-80v200Zm40-100Z" />
+                    </svg>
+                    <p id="diagnosisSummaryText" class="text-sm text-on-surface font-medium">Powdery Mildew confirmed
+                        with high confidence.</p>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <span id="recommendationSourceBadge"
+                        class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 opacity-70">
+                        Initializing...
+                    </span>
                 </div>
             </div>
         </section>
@@ -560,7 +613,7 @@
         <section class="px-6 mt-6">
             <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/15">
                 <p class="text-sm font-label text-zinc-500 uppercase tracking-wider mb-4">Symptoms</p>
-                <div class="space-y-3">
+                <div id="symptomsList" class="space-y-3">
                     <div class="flex items-start gap-3">
                         <span class="w-1.5 h-1.5 rounded-full bg-primary mt-2"></span>
                         <p class="text-on-surface leading-relaxed">Distinct circular white, flour-like spots appearing
@@ -577,10 +630,14 @@
         <!-- Treatment Plan -->
         <section class="px-6 mt-8">
             <h3 class="text-lg font-bold mb-4 text-on-surface flex items-center gap-2">
-                <span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill=currentColor>
+                    <path
+                        d="M160-80q-33 0-56.5-23.5T80-160v-480q0-33 23.5-56.5T160-720h160v-80q0-33 23.5-56.5T400-880h160q33 0 56.5 23.5T640-800v80h160q33 0 56.5 23.5T880-640v480q0 33-23.5 56.5T800-80H160Zm0-80h640v-480H160v480Zm240-560h160v-80H400v80ZM160-160v-480 480Zm280-200v120h80v-120h120v-80H520v-120h-80v120H320v80h120Z" />
+                </svg>
                 Treatment Plan
             </h3>
-            <div class="space-y-4">
+            <div id="treatmentList" class="space-y-4">
                 <div class="flex gap-4 group">
                     <div
                         class="flex-none w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
@@ -621,7 +678,7 @@
                         <span class="material-symbols-outlined" data-icon="shield">shield</span>
                         Prevention Tips
                     </h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ul id="preventionList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <li
                             class="flex items-center gap-3 text-sm text-on-surface-variant bg-white/60 p-3 rounded-xl backdrop-blur-sm">
                             <span class="material-symbols-outlined text-primary text-lg"
@@ -720,11 +777,23 @@
 
     <script>
             (function () {
+                // --- UI VARIABLES ---
+                var myJsApiKey = "";
+                var hasFetchedAI = false;
                 var settingsToggle = document.getElementById('settingsToggle');
                 var settingsMenu = document.getElementById('settingsMenu');
                 var resultHeroImage = document.getElementById('resultHeroImage');
                 var resultLabel = document.getElementById('resultLabel');
                 var resultConfidence = document.getElementById('resultConfidence');
+                var primaryDiseaseName = document.getElementById('primaryDiseaseName');
+                var primaryDiseasePercent = document.getElementById('primaryDiseasePercent');
+                var primaryDiseaseBar = document.getElementById('primaryDiseaseBar');
+                var diagnosisSummaryText = document.getElementById('diagnosisSummaryText');
+                var recommendationSourceBadge = document.getElementById('recommendationSourceBadge');
+                var recommendationSourceDetails = document.getElementById('recommendationSourceDetails');
+                var symptomsList = document.getElementById('symptomsList');
+                var treatmentList = document.getElementById('treatmentList');
+                var preventionList = document.getElementById('preventionList');
                 var scanAnotherBtn = document.getElementById('scanAnotherBtn');
                 var backHomeBtn = document.getElementById('backHomeBtn');
                 var preScanModal = document.getElementById('preScanModal');
@@ -733,214 +802,269 @@
                 var waitingBridgeHandoff = false;
                 var handoffTriggered = false;
 
-                function closeMenu() {
-                    if (!settingsToggle || !settingsMenu) {
-                        return;
-                    }
-                    settingsMenu.classList.remove('is-open');
-                    settingsToggle.setAttribute('aria-expanded', 'false');
-                }
-
-                function openMenu() {
-                    if (!settingsToggle || !settingsMenu) {
-                        return;
-                    }
-                    settingsMenu.classList.add('is-open');
-                    settingsToggle.setAttribute('aria-expanded', 'true');
-                }
-
+                // --- MENU & MODAL LOGIC ---
+                function closeMenu() { if (settingsMenu) settingsMenu.classList.remove('is-open'); }
+                function openMenu() { if (settingsMenu) settingsMenu.classList.add('is-open'); }
                 if (settingsToggle && settingsMenu) {
-                    settingsToggle.addEventListener('click', function (event) {
-                        event.stopPropagation();
-                        if (settingsMenu.classList.contains('is-open')) {
-                            closeMenu();
-                        } else {
-                            openMenu();
-                        }
-                    });
-
-                    settingsMenu.addEventListener('click', function (event) {
-                        event.stopPropagation();
-                    });
-
+                    settingsToggle.addEventListener('click', function (e) { e.stopPropagation(); settingsMenu.classList.contains('is-open') ? closeMenu() : openMenu(); });
                     document.addEventListener('click', closeMenu);
-                    document.addEventListener('keydown', function (event) {
-                        if (event.key === 'Escape') {
-                            closeMenu();
-                        }
+                }
+                function openPreScanModal() { if (preScanModal) { preScanModal.classList.add('is-open'); preScanModal.setAttribute('aria-hidden', 'false'); } }
+                function closePreScanModal() { if (preScanModal) { preScanModal.classList.remove('is-open'); preScanModal.setAttribute('aria-hidden', 'true'); } }
+                if (scanAnotherBtn) scanAnotherBtn.addEventListener('click', openPreScanModal);
+                if (preScanCloseButton) preScanCloseButton.addEventListener('click', closePreScanModal);
+                if (backHomeBtn) backHomeBtn.addEventListener('click', function () { window.location.href = 'index.html'; });
+                if (startCameraButton) {
+                    startCameraButton.addEventListener('click', function () {
+                        closePreScanModal();
+                        if (!window.AppInventor) return alert('App Inventor bridge not found. Camera only works on the phone!');
+                        waitingBridgeHandoff = true;
+                        handoffTriggered = false;
+                        window.AppInventor.setWebViewString('OPEN_CAMERA');
                     });
                 }
 
-                function formatLabel(rawLabel) {
-                    if (!rawLabel) {
-                        return 'Unknown';
-                    }
-
-                    return String(rawLabel)
+                // --- DATA HELPERS ---
+                function formatLabel(rawLabel) { return String(rawLabel || 'Unknown').replace(/[_-]+/g, ' ').trim(); }
+                function normalizeLabel(rawLabel) {
+                    return String(rawLabel || '')
+                        .toLowerCase()
                         .replace(/[_-]+/g, ' ')
                         .replace(/\s+/g, ' ')
-                        .replace(/^\s+|\s+$/g, '');
+                        .trim();
                 }
-
                 function readResult() {
-                    var rawData = '';
-
-                    try {
-                        rawData = sessionStorage.getItem('plantcam_scan_result') || '';
-                    } catch (error) {
-                        console.warn('Session read failed:', error);
-                    }
-
-                    if (!rawData) {
-                        try {
-                            rawData = localStorage.getItem('plantcam_scan_result') || '';
-                        } catch (error) {
-                            console.warn('Local read failed:', error);
-                        }
-                    }
-
-                    if (!rawData) {
+                    try { return JSON.parse(sessionStorage.getItem('plantcam_scan_result') || localStorage.getItem('plantcam_scan_result') || 'null'); }
+                    catch (e) { return null; }
+                }
+                function getDiseaseDataByLabel(rawLabel) {
+                    var db = typeof localFallbackDB !== 'undefined' ? localFallbackDB : (window.localFallbackDB || null);
+                    if (!db || !rawLabel) {
                         return null;
                     }
 
-                    try {
-                        return JSON.parse(rawData);
-                    } catch (error) {
-                        console.warn('Result parse failed:', error);
-                        return null;
+                    if (db[rawLabel]) {
+                        return db[rawLabel];
+                    }
+
+                    var target = normalizeLabel(rawLabel);
+                    var keys = Object.keys(db);
+                    for (var i = 0; i < keys.length; i += 1) {
+                        if (normalizeLabel(keys[i]) === target) {
+                            return db[keys[i]];
+                        }
+                    }
+
+                    return null;
+                }
+
+                function getFallbackByLabel(rawLabel) {
+                    var bestMatch =
+                        getDiseaseDataByLabel(rawLabel) ||
+                        getDiseaseDataByLabel(formatLabel(rawLabel)) ||
+                        getDiseaseDataByLabel('Not A Plant');
+
+                    if (bestMatch) {
+                        return bestMatch;
+                    }
+
+                    return {
+                        symptoms: ['No local disease record found for this label.'],
+                        treatments: ['Rescan the leaf under brighter natural lighting.'],
+                        preventions: ['Keep the app database updated.']
+                    };
+                }
+
+                // --- UI RENDERERS ---
+                function renderList(container, items, type) {
+                    if (!container || !items || !items.length) return;
+                    container.innerHTML = '';
+                    items.forEach(function (item, i) {
+                        if (type === 'symptom') {
+                            container.innerHTML += '<div class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0"></span><p class="text-on-surface leading-relaxed">' + item + '</p></div>';
+                        } else if (type === 'treatment') {
+                            container.innerHTML += '<div class="flex gap-4 group"><div class="flex-none w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">' + (i + 1) + '</div><div class="flex-1 pb-4"><h4 class="font-bold text-on-surface mb-1">Step ' + (i + 1) + '</h4><p class="text-sm text-zinc-600 leading-relaxed">' + item + '</p></div></div>';
+                        } else if (type === 'prevention') {
+                            var icon = i % 2 === 0 ? 'check_circle' : 'eco';
+                            container.innerHTML += '<li class="flex items-center gap-3 text-sm text-on-surface-variant bg-white/60 p-3 rounded-xl backdrop-blur-sm"><span class="material-symbols-outlined text-primary text-lg">' + icon + '</span>' + item + '</li>';
+                        }
+                    });
+                }
+
+                function updateRecommendationSourceUI(source, reason) {
+                    if (!recommendationSourceBadge) return;
+
+                    if (source === 'openrouter') {
+                        recommendationSourceBadge.textContent = '✦ AI-Powered Insights';
+                        recommendationSourceBadge.classList.replace('text-zinc-400', 'text-primary');
+                    } else if (source === 'fallback') {
+                        recommendationSourceBadge.textContent = 'Local Powered Insights';
+                        recommendationSourceBadge.classList.replace('text-primary', 'text-zinc-400');
+                    } else {
+                        recommendationSourceBadge.textContent = 'Analyzing Data...';
                     }
                 }
 
-                function readPayloadFallback() {
-                    var payload = '';
+                async function fetchSmartRecommendation(diseaseName, fallbackData) {
+                    var fallback = fallbackData || getFallbackByLabel(diseaseName);
 
+                    // Gagamit na tayo ng global variable na 'myJsApiKey'
+                    if (!myJsApiKey || myJsApiKey === "OPEN_CAMERA" || myJsApiKey.length < 20) {
+                        return { source: 'fallback', data: fallback, reason: 'Waiting for valid API Key from bridge...' };
+                    }
+                    var backoffKey = 'plantcam_openrouter_backoff_until';
+                    var now = Date.now();
+
+                    var backoffUntil = 0;
                     try {
-                        payload = sessionStorage.getItem('plantcam_scan_payload') || '';
-                    } catch (error) {
-                        console.warn('Session payload read failed:', error);
+                        backoffUntil = Number(localStorage.getItem(backoffKey) || '0');
+                    } catch (e) {
+                        backoffUntil = 0;
                     }
 
-                    if (!payload) {
+                    if (backoffUntil && now < backoffUntil) {
+                        return {
+                            source: 'fallback',
+                            data: fallback,
+                            reason: 'OpenRouter temporary backoff active. Using local database.'
+                        };
+                    }
+
+                    if (!myJsApiKey || myJsApiKey === 'YOUR_OPENROUTER_API_KEY_HERE') {
+                        return { source: 'fallback', data: fallback, reason: 'No OpenRouter API Key provided.' };
+                    }
+
+                    var prompt = 'You are an agriculturist. The plant disease is: "' + diseaseName + '". Return ONLY valid JSON with this shape: {"symptoms":["..."],"treatments":["..."],"preventions":["..."]}. Provide 2-3 short items per array. Do not use markdown.';
+
+                    // ✅ Model cascade — 4 free models tried in order.
+                    //    Each has its own independent rate-limit quota on OpenRouter.
+                    //    If one returns 429 (rate limited) or 404 (not found), the next is tried.
+                    //    Final safety net is always plant-data.js local fallback.
+                    var modelsToTry = [
+                        'meta-llama/llama-3.1-8b-instruct:free',   // Primary: Llama 3.1 8B
+                        'mistralai/mistral-7b-instruct:free',       // Secondary: Mistral 7B
+                        'qwen/qwen2.5-7b-instruct:free',            // Tertiary: Qwen 2.5 7B
+                        'google/gemma-3-4b-it:free'                 // Last resort: Gemma 3 4B
+                    ];
+
+                    for (var m = 0; m < modelsToTry.length; m++) {
+                        var currentModel = modelsToTry[m];
                         try {
-                            payload = localStorage.getItem('plantcam_scan_payload') || '';
+                            var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + myJsApiKey,
+                                    'HTTP-Referer': 'https://botanicalatelier.com',
+                                    'X-Title': 'PlantCam App'
+                                },
+                                body: JSON.stringify({
+                                    model: currentModel,
+                                    messages: [{ role: 'user', content: prompt }],
+                                    temperature: 0.2
+                                })
+                            });
+
+                            if (!response.ok) {
+                                var errorText = await response.text();
+                                var errorMessage = errorText;
+
+                                try {
+                                    var parsedError = JSON.parse(errorText);
+                                    errorMessage =
+                                        (parsedError && parsedError.error && parsedError.error.message)
+                                            ? String(parsedError.error.message)
+                                            : errorText;
+                                } catch (parseError) {
+                                    errorMessage = errorText;
+                                }
+
+                                // Skip to next model on 404 (gone) or 429 (rate limited)
+                                if ((response.status === 404 || response.status === 429) && m < modelsToTry.length - 1) {
+                                    console.warn('Model "' + currentModel + '" returned ' + response.status + '. Trying next model...');
+                                    continue; // try the next model in the list
+                                }
+                                // Set backoff only when all models exhausted on 429, or on 400
+                                if (response.status === 400 || response.status === 429) {
+                                    try {
+                                        var backoffMs = response.status === 429 ? 10 * 60 * 1000 : 5 * 60 * 1000;
+                                        localStorage.setItem(backoffKey, String(Date.now() + backoffMs));
+                                    } catch (e) { /* ignore */ }
+                                }
+
+                                throw new Error('OpenRouter API Error ' + response.status + ' [' + currentModel + ']: ' + String(errorMessage).slice(0, 200));
+                            }
+
+                            var data = await response.json();
+                            var rawText = data.choices[0].message.content;
+                            var cleanText = String(rawText).replace(/```json/g, '').replace(/```/g, '').trim();
+                            var parsedData = JSON.parse(cleanText);
+
+                            var finalData = {
+                                symptoms: Array.isArray(parsedData.symptoms) ? parsedData.symptoms : fallback.symptoms,
+                                treatments: Array.isArray(parsedData.treatments) ? parsedData.treatments : fallback.treatments,
+                                preventions: Array.isArray(parsedData.preventions) ? parsedData.preventions : fallback.preventions
+                            };
+
+                            // ✅ FIX: Correct source label (was 'gemini', now 'openrouter')
+                            return { source: 'openrouter', data: finalData, reason: '' };
+
                         } catch (error) {
-                            console.warn('Local payload read failed:', error);
+                            if (m < modelsToTry.length - 1) {
+                                console.warn('Model attempt ' + (m + 1) + ' failed:', error.message, '— trying next...');
+                                continue;
+                            }
+                            // All models exhausted — use local fallback
+                            console.error('All OpenRouter models failed. Using local fallback.', error);
+                            return { source: 'fallback', data: fallback, reason: error.message };
                         }
                     }
 
-                    if (!payload) {
-                        return '';
-                    }
-
-                    if (String(payload).indexOf('data:image') === 0) {
-                        return payload;
-                    }
-
-                    return 'data:image/jpeg;base64,' + payload;
+                    // Safety net — should never reach here
+                    return { source: 'fallback', data: fallback, reason: 'Unexpected error in model loop.' };
                 }
-
-                function openPreScanModal() {
-                    if (!preScanModal) {
-                        return;
-                    }
-
-                    preScanModal.classList.add('is-open');
-                    preScanModal.setAttribute('aria-hidden', 'false');
-                    document.body.classList.add('modal-open');
-                }
-
-                function closePreScanModal() {
-                    if (!preScanModal) {
-                        return;
-                    }
-
-                    preScanModal.classList.remove('is-open');
-                    preScanModal.setAttribute('aria-hidden', 'true');
-                    document.body.classList.remove('modal-open');
-                }
-
-                function triggerCameraFromResult() {
-                    closePreScanModal();
-
-                    if (!window.AppInventor) {
-                        alert('App Inventor bridge not found. Camera only works on the phone!');
-                        return;
-                    }
-
-                    waitingBridgeHandoff = true;
-                    handoffTriggered = false;
-                    window.AppInventor.setWebViewString('OPEN_CAMERA');
-                }
-
-                if (scanAnotherBtn) {
-                    scanAnotherBtn.addEventListener('click', function () {
-                        openPreScanModal();
-                    });
-                }
-
-                if (preScanCloseButton) {
-                    preScanCloseButton.addEventListener('click', closePreScanModal);
-                }
-
-                if (startCameraButton) {
-                    startCameraButton.addEventListener('click', triggerCameraFromResult);
-                }
-
-                if (preScanModal) {
-                    preScanModal.addEventListener('click', function (event) {
-                        if (event.target === preScanModal) {
-                            closePreScanModal();
-                        }
-                    });
-                }
-
-                setInterval(function () {
-                    if (!waitingBridgeHandoff || handoffTriggered || !window.AppInventor) {
-                        return;
-                    }
-
-                    var incomingData = window.AppInventor.getWebViewString();
-                    var rawMessage = String(incomingData || '').trim();
-
-                    if (!rawMessage || rawMessage === 'OPEN_CAMERA') {
-                        return;
-                    }
-
-                    handoffTriggered = true;
-                    waitingBridgeHandoff = false;
-                    window.location.href = 'plant-scanning.html';
-                }, 120);
-
-                if (backHomeBtn) {
-                    backHomeBtn.addEventListener('click', function () {
-                        window.location.href = 'index.html';
-                    });
-                }
-
-                document.addEventListener('keydown', function (event) {
-                    if (event.key === 'Escape') {
-                        closePreScanModal();
-                    }
-                });
-
+                // --- INITIALIZATION & BRIDGE WATCHER ---
                 var result = readResult();
-                if (!result || !result.label) {
-                    resultLabel.textContent = 'No result yet';
-                    resultConfidence.textContent = 'Confidence: 0.00%';
-                    return;
-                }
+                if (result && result.label) {
+                    var diseaseLabel = formatLabel(result.label);
+                    var conf = Number(result.confidence || 0).toFixed(2);
 
-                resultLabel.textContent = formatLabel(result.label);
-                resultConfidence.textContent = 'Confidence: ' + Number(result.confidence || 0).toFixed(2) + '%';
+                    // Render agad ang basic UI mula sa scan result
+                    if (resultLabel) resultLabel.textContent = diseaseLabel;
+                    if (resultConfidence) resultConfidence.textContent = 'Confidence: ' + conf + '%';
+                    if (primaryDiseaseName) primaryDiseaseName.textContent = diseaseLabel;
+                    if (primaryDiseasePercent) primaryDiseasePercent.textContent = conf + '%';
+                    if (primaryDiseaseBar) primaryDiseaseBar.style.width = conf + '%';
+                    if (diagnosisSummaryText) diagnosisSummaryText.textContent = diseaseLabel + ' detected with ' + (conf >= 80 ? 'high' : 'moderate') + ' confidence.';
+                    if (resultHeroImage && result.previewImage) resultHeroImage.src = result.previewImage;
 
-                if (result.previewImage) {
-                    resultHeroImage.src = result.previewImage;
-                    return;
-                }
+                    updateRecommendationSourceUI('loading', '');
+                    var fallbackData = getFallbackByLabel(result.label || diseaseLabel);
 
-                var fallbackImage = readPayloadFallback();
-                if (fallbackImage) {
-                    resultHeroImage.src = fallbackImage;
+                    // --- BRIDGE WATCHER ---
+                    // Ito ang mag-aabang hanggang sa makuha ang API Key mula sa MIT App Inventor
+                    var bridgeInterval = setInterval(function () {
+                        var rawMessage = String(window.AppInventor ? window.AppInventor.getWebViewString() : '').trim();
+
+                        if (waitingBridgeHandoff && !handoffTriggered && rawMessage.indexOf('IMG_START:') === 0) {
+                            handoffTriggered = true;
+                            waitingBridgeHandoff = false;
+                            window.location.href = 'plant-scanning.html';
+                            return;
+                        }
+
+                        if (rawMessage.length > 20 && !hasFetchedAI && rawMessage.indexOf('IMG_START:') !== 0) {
+                            myJsApiKey = rawMessage;
+                            hasFetchedAI = true; // Isang beses lang tatawag sa AI
+
+                            fetchSmartRecommendation(diseaseLabel, fallbackData).then(function (recommendation) {
+                                updateRecommendationSourceUI(recommendation.source, recommendation.reason);
+                                renderList(symptomsList, recommendation.data.symptoms, 'symptom');
+                                renderList(treatmentList, recommendation.data.treatments, 'treatment');
+                                renderList(preventionList, recommendation.data.preventions, 'prevention');
+                            });
+                        }
+                    }, 150);
                 }
             })();
     </script>
