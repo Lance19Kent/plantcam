@@ -671,6 +671,209 @@
             box-shadow: 0 10px 24px rgba(180, 53, 49, 0.24);
         }
 
+        .action-dialog-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 130;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(8, 20, 10, 0.32);
+            backdrop-filter: blur(6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 160ms ease;
+        }
+
+        .action-dialog-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .action-dialog {
+            width: min(100%, 360px);
+            border-radius: 22px;
+            border: 1px solid rgba(188, 203, 184, 0.55);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 24px 44px rgba(19, 30, 20, 0.2);
+            padding: 18px 16px 14px;
+            text-align: left;
+            transform: translateY(10px) scale(0.98);
+            transition: transform 160ms ease;
+        }
+
+        .action-dialog-overlay.is-open .action-dialog {
+            transform: translateY(0) scale(1);
+            animation: dialogPopIn 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        .action-dialog-overlay.is-closing .action-dialog {
+            animation: dialogPopOut 160ms ease both;
+        }
+
+        .action-dialog-title {
+            margin: 0;
+            font-size: 1.12rem;
+            line-height: 1.35;
+            font-weight: 700;
+            color: #153422;
+            letter-spacing: -0.01em;
+        }
+
+        .action-dialog-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .action-dialog-body {
+            margin: 8px 0 14px;
+            font-size: 0.94rem;
+            line-height: 1.5;
+            color: #2b4933;
+        }
+
+        .action-dialog-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 0;
+            border: 1px solid transparent;
+            flex-shrink: 0;
+        }
+
+        .action-dialog-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            object-fit: contain;
+            padding: 6px;
+            margin-bottom: 0;
+            border: 1px solid rgba(188, 203, 184, 0.35);
+            background: rgba(188, 203, 184, 0.16);
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .action-dialog-logo.is-visible {
+            display: block;
+        }
+
+        .action-dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .action-dialog-btn {
+            min-width: 92px;
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-height: 40px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            color: #ffffff;
+            background: #006e28;
+            cursor: pointer;
+        }
+
+        .action-dialog-btn.is-full-width {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .action-dialog[data-tone="success"] .action-dialog-btn {
+            background: #0f8a38;
+        }
+
+        .action-dialog[data-tone="info"] .action-dialog-btn {
+            background: #006e28;
+        }
+
+        .action-dialog[data-tone="error"] {
+            border-color: rgba(220, 53, 69, 0.32);
+            background: linear-gradient(180deg, rgba(255, 246, 246, 0.97), rgba(255, 255, 255, 0.98));
+        }
+
+        .action-dialog[data-tone="error"] .action-dialog-title {
+            color: #8a2f2b;
+        }
+
+        .action-dialog[data-tone="error"] .action-dialog-body {
+            color: #6f3532;
+        }
+
+        .action-dialog[data-tone="error"] .action-dialog-btn {
+            background: #b9363f;
+        }
+
+        .action-dialog[data-tone="error"] .action-dialog-badge {
+            color: #8a2f2b;
+            background: rgba(220, 53, 69, 0.12);
+            border-color: rgba(220, 53, 69, 0.26);
+        }
+
+        .action-dialog[data-tone="error"] .action-dialog-logo {
+            border-color: rgba(220, 53, 69, 0.26);
+            background: rgba(220, 53, 69, 0.12);
+        }
+
+        .action-dialog[data-tone="success"] {
+            border-color: rgba(22, 163, 74, 0.34);
+            background: linear-gradient(180deg, rgba(244, 255, 247, 0.97), rgba(255, 255, 255, 0.98));
+        }
+
+        .action-dialog[data-tone="success"] .action-dialog-title {
+            color: #0e6a35;
+        }
+
+        .action-dialog[data-tone="success"] .action-dialog-body {
+            color: #27543a;
+        }
+
+        .action-dialog[data-tone="success"] .action-dialog-badge {
+            color: #0e6a35;
+            background: rgba(15, 138, 56, 0.14);
+            border-color: rgba(15, 138, 56, 0.3);
+        }
+
+        .action-dialog[data-tone="success"] .action-dialog-logo {
+            border-color: rgba(15, 138, 56, 0.3);
+            background: rgba(15, 138, 56, 0.14);
+        }
+
+        @keyframes dialogPopIn {
+            0% {
+                opacity: 0;
+                transform: translateY(14px) scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes dialogPopOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(10px) scale(0.97);
+            }
+        }
+
         .history-loading .entry-card {
             cursor: default;
             border-color: rgba(188, 203, 184, 0.2);
@@ -844,6 +1047,20 @@
             </div>
         </div>
     </div>
+    <div id="actionDialogOverlay" class="action-dialog-overlay" hidden>
+        <div id="actionDialog" class="action-dialog" data-tone="info" role="dialog" aria-modal="true"
+            aria-labelledby="actionDialogTitle" aria-describedby="actionDialogBody">
+            <div class="action-dialog-head">
+                <img id="actionDialogLogo" class="action-dialog-logo" alt="" aria-hidden="true" />
+                <div id="actionDialogBadge" class="action-dialog-badge" aria-hidden="true">i</div>
+                <h2 id="actionDialogTitle" class="action-dialog-title">Notice</h2>
+            </div>
+            <p id="actionDialogBody" class="action-dialog-body"></p>
+            <div class="action-dialog-actions">
+                <button id="actionDialogOk" type="button" class="action-dialog-btn">OK</button>
+            </div>
+        </div>
+    </div>
     <script>
         (function () {
             var settingsToggle = document.getElementById('settingsToggle');
@@ -900,9 +1117,102 @@
             var deleteCancelBtn = document.getElementById('deleteCancelBtn');
             var deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
             var deleteMessage = document.getElementById('deleteMessage');
+            var actionDialogOverlay = document.getElementById('actionDialogOverlay');
+            var actionDialog = document.getElementById('actionDialog');
+            var actionDialogTitle = document.getElementById('actionDialogTitle');
+            var actionDialogBody = document.getElementById('actionDialogBody');
+            var actionDialogOk = document.getElementById('actionDialogOk');
+            var actionDialogLogo = document.getElementById('actionDialogLogo');
+            var actionDialogBadge = document.getElementById('actionDialogBadge');
+            var dialogConfirmHandler = null;
+            var dialogCloseTimer = null;
             var isBulkToggling = false;
             if (!historySections) {
                 return;
+            }
+
+            var DIALOG_THEME = {
+                buttonFullWidth: true,
+                logos: {
+                    success: '',
+                    error: '',
+                    info: ''
+                },
+                icons: {
+                    success: '✓',
+                    error: '!',
+                    info: 'i'
+                }
+            };
+
+            function closeActionDialog() {
+                if (!actionDialogOverlay) {
+                    return;
+                }
+
+                actionDialogOverlay.classList.remove('is-open');
+                actionDialogOverlay.classList.add('is-closing');
+                if (dialogCloseTimer) {
+                    clearTimeout(dialogCloseTimer);
+                }
+                dialogCloseTimer = setTimeout(function () {
+                    actionDialogOverlay.classList.remove('is-closing');
+                    actionDialogOverlay.hidden = true;
+                }, 170);
+            }
+
+            function openActionDialog(config) {
+                if (!actionDialogOverlay || !actionDialog || !actionDialogTitle || !actionDialogBody || !actionDialogOk || !actionDialogBadge || !actionDialogLogo) {
+                    return;
+                }
+
+                var safeConfig = config || {};
+                var tone = safeConfig.tone || 'info';
+                var iconText = (safeConfig.badgeText || (DIALOG_THEME.icons && DIALOG_THEME.icons[tone])) || 'i';
+                var defaultLogo = DIALOG_THEME.logos && DIALOG_THEME.logos[tone] ? DIALOG_THEME.logos[tone] : '';
+                var logoSrc = typeof safeConfig.logoSrc === 'string' ? safeConfig.logoSrc : defaultLogo;
+                var buttonFullWidth = typeof safeConfig.fullWidthButton === 'boolean' ? safeConfig.fullWidthButton : !!DIALOG_THEME.buttonFullWidth;
+
+                actionDialogTitle.textContent = safeConfig.title || 'Notice';
+                actionDialogBody.textContent = safeConfig.message || '';
+                actionDialogOk.textContent = safeConfig.okText || 'OK';
+                actionDialog.setAttribute('data-tone', tone);
+                actionDialogOk.classList.toggle('is-full-width', buttonFullWidth);
+
+                if (logoSrc) {
+                    actionDialogLogo.src = logoSrc;
+                    actionDialogLogo.classList.add('is-visible');
+                    actionDialogLogo.hidden = false;
+                    actionDialogBadge.hidden = true;
+                    actionDialogBadge.classList.remove('is-visible');
+                } else {
+                    actionDialogLogo.removeAttribute('src');
+                    actionDialogLogo.classList.remove('is-visible');
+                    actionDialogLogo.hidden = true;
+                    actionDialogBadge.hidden = false;
+                    actionDialogBadge.textContent = iconText;
+                }
+
+                actionDialogLogo.onerror = function () {
+                    actionDialogLogo.removeAttribute('src');
+                    actionDialogLogo.classList.remove('is-visible');
+                    actionDialogLogo.hidden = true;
+                    actionDialogBadge.hidden = false;
+                    actionDialogBadge.textContent = iconText;
+                };
+
+                dialogConfirmHandler = typeof safeConfig.onConfirm === 'function' ? safeConfig.onConfirm : null;
+
+                if (dialogCloseTimer) {
+                    clearTimeout(dialogCloseTimer);
+                    dialogCloseTimer = null;
+                }
+                actionDialogOverlay.classList.remove('is-closing');
+                actionDialogOverlay.hidden = false;
+                requestAnimationFrame(function () {
+                    actionDialogOverlay.classList.add('is-open');
+                    actionDialogOk.focus();
+                });
             }
 
             function isObject(value) {
@@ -1417,6 +1727,15 @@
                 }
 
                 closeDeleteModal();
+                var message = (removedIds.length === 1)
+                    ? '1 scan was removed from history.'
+                    : removedIds.length + ' scans were removed from history.';
+                openActionDialog({
+                    title: 'Scan Deleted',
+                    message: message,
+                    tone: 'error',
+                    okText: 'OK'
+                });
             }
 
             function bindSelectionHandlers() {
@@ -1520,6 +1839,17 @@
 
             if (deleteConfirmBtn) {
                 deleteConfirmBtn.addEventListener('click', deleteSelectedItems);
+            }
+
+            if (actionDialogOk) {
+                actionDialogOk.addEventListener('click', function () {
+                    var onConfirm = dialogConfirmHandler;
+                    dialogConfirmHandler = null;
+                    closeActionDialog();
+                    if (onConfirm) {
+                        onConfirm();
+                    }
+                });
             }
         })();
     </script>
