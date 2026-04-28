@@ -48,7 +48,7 @@
             background: #ffffff;
             font-family: 'Inter', sans-serif;
             color: var(--color-on-surface);
-            min-height: max(884px, 100dvh);
+            min-height: 100dvh;
             -webkit-user-select: none;
             user-select: none;
             /* Prevents text highlighting when long-pressing buttons */
@@ -56,6 +56,10 @@
             /* Removes the ugly blue box when tapping links */
             touch-action: manipulation;
             /* Optimizes for fast taps and prevents accidental zooming */
+        }
+
+        body.is-history-empty {
+            min-height: 100dvh;
         }
 
         .top-app-bar {
@@ -116,6 +120,22 @@
             max-width: 720px;
             margin: 0 auto;
             padding: 80px 24px 132px;
+        }
+
+        .main-content.is-compact {
+            padding-bottom: 96px;
+        }
+
+        .main-content.is-history-empty {
+            min-height: calc(100dvh - 64px - 132px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-sections.is-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
         }
 
         .search-filter-row {
@@ -1529,6 +1549,16 @@
             }
 
             function renderEmptyState() {
+                document.body.classList.add('is-history-empty');
+                if (historySections) {
+                    historySections.classList.add('is-empty');
+                }
+                var mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.classList.add('is-history-empty');
+                    mainContent.classList.remove('is-compact');
+                }
+
                 historySections.innerHTML =
                     '<section>' +
                     '<div class="history-empty botanical-shadow">' +
@@ -1546,6 +1576,16 @@
             }
 
             function renderLoadingState() {
+                document.body.classList.remove('is-history-empty');
+                if (historySections) {
+                    historySections.classList.remove('is-empty');
+                }
+                var mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.classList.remove('is-history-empty');
+                    mainContent.classList.remove('is-compact');
+                }
+
                 var cards = '';
                 for (var i = 0; i < 3; i++) {
                     cards += '' +
@@ -1572,6 +1612,20 @@
                 if (!records || !records.length) {
                     renderEmptyState();
                     return;
+                }
+
+                document.body.classList.remove('is-history-empty');
+                if (historySections) {
+                    historySections.classList.remove('is-empty');
+                }
+                var mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.classList.remove('is-history-empty');
+                    if (records.length <= 2) {
+                        mainContent.classList.add('is-compact');
+                    } else {
+                        mainContent.classList.remove('is-compact');
+                    }
                 }
 
                 records.sort(function (a, b) {
