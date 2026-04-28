@@ -161,7 +161,7 @@
         .search-input {
             width: 100%;
             height: 48px;
-            padding: 0 16px 0 48px;
+            padding: 0 44px 0 48px;
             border: 0;
             border-radius: 16px;
             background: var(--color-surface-highest);
@@ -169,6 +169,35 @@
             font-size: 0.875rem;
             transition: box-shadow 0.2s ease, background 0.2s ease;
             outline: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border: 0;
+            background: transparent;
+            color: rgba(61, 74, 60, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .search-clear.is-visible {
+            display: inline-flex;
+        }
+
+        .search-clear:hover {
+            color: rgba(61, 74, 60, 0.85);
+        }
+
+        .search-clear:active {
+            transform: translateY(-50%) scale(0.95);
         }
 
         .search-input::placeholder {
@@ -984,6 +1013,13 @@
                         d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
                 </svg>
                 <input id="historySearchInput" class="search-input" placeholder="Search plants..." type="text" />
+                <button id="historySearchClear" class="search-clear" type="button" aria-label="Clear search">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
+                        fill="currentColor">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg>
+                </button>
             </div>
             <button class="filter-button" type="button" aria-label="Filter">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -1131,6 +1167,7 @@
         (function () {
             var historySections = document.getElementById('historySections');
             var searchInput = document.getElementById('historySearchInput');
+            var searchClear = document.getElementById('historySearchClear');
             var selectAllCheckbox = document.getElementById('selectAllCheckbox');
             var deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
             var deleteModal = document.getElementById('deleteModal');
@@ -1720,6 +1757,15 @@
                 renderHistory(filtered, { isFilter: true, query: currentQuery });
             }
 
+            function syncSearchClearButton() {
+                if (!searchInput || !searchClear) {
+                    return;
+                }
+
+                var hasValue = String(searchInput.value || '').trim().length > 0;
+                searchClear.classList.toggle('is-visible', hasValue);
+            }
+
             var HISTORY_CACHE_KEY = 'plantcam_history_cache_v1';
             var HISTORY_CACHE_TTL_MS = 2 * 60 * 1000;
 
@@ -2037,7 +2083,20 @@
             }
 
             if (searchInput) {
-                searchInput.addEventListener('input', applyFilter);
+                searchInput.addEventListener('input', function () {
+                    applyFilter();
+                    syncSearchClearButton();
+                });
+                syncSearchClearButton();
+            }
+
+            if (searchClear && searchInput) {
+                searchClear.addEventListener('click', function () {
+                    searchInput.value = '';
+                    searchInput.focus();
+                    applyFilter();
+                    syncSearchClearButton();
+                });
             }
         })();
     </script>
