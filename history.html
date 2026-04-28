@@ -1536,6 +1536,13 @@
                     '<p>After your first successful scan, it will appear here automatically.</p>' +
                     '</div>' +
                     '</section>';
+
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+
+                updateDeleteButtonState();
             }
 
             function renderLoadingState() {
@@ -1605,6 +1612,65 @@
 
                 historySections.innerHTML = html;
                 bindSelectionHandlers();
+            }
+
+            var HISTORY_CACHE_KEY = 'plantcam_history_cache_v1';
+            var HISTORY_CACHE_TTL_MS = 2 * 60 * 1000;
+
+            function readHistoryCache() {
+                var raw = '';
+                try {
+                    raw = sessionStorage.getItem(HISTORY_CACHE_KEY) || '';
+                } catch (e) {
+                    raw = '';
+                }
+
+                if (!raw) {
+                    try {
+                        raw = localStorage.getItem(HISTORY_CACHE_KEY) || '';
+                    } catch (e) {
+                        raw = '';
+                    }
+                }
+
+                if (!raw) {
+                    return null;
+                }
+
+                try {
+                    var payload = JSON.parse(raw);
+                    if (!payload || !Array.isArray(payload.records)) {
+                        return null;
+                    }
+
+                    if (payload.savedAt && (Date.now() - payload.savedAt) > HISTORY_CACHE_TTL_MS) {
+                        return null;
+                    }
+
+                    return payload.records;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function writeHistoryCache(records) {
+                var payload = JSON.stringify({
+                    savedAt: Date.now(),
+                    records: records || []
+                });
+
+                try {
+                    sessionStorage.setItem(HISTORY_CACHE_KEY, payload);
+                    return;
+                } catch (e) {
+                    // Continue to local storage.
+                }
+
+                try {
+                    localStorage.setItem(HISTORY_CACHE_KEY, payload);
+                } catch (e) {
+                    // Ignore cache failure.
+                }
             }
 
             function getItemCheckboxes() {
@@ -1720,6 +1786,7 @@
                 }
 
                 if (!historySections.querySelector('.entry-card')) {
+                    writeHistoryCache([]);
                     renderEmptyState();
                 } else {
                     updateSelectAllState();
@@ -1770,6 +1837,7 @@
 
                 var records = normalizeHistoryPayload(text);
                 renderHistory(records);
+                writeHistoryCache(records);
                 return true;
             }
 
@@ -1779,7 +1847,12 @@
                     return;
                 }
 
-                renderLoadingState();
+                var cachedRecords = readHistoryCache();
+                if (cachedRecords) {
+                    renderHistory(cachedRecords);
+                } else {
+                    renderLoadingState();
+                }
 
                 try {
                     window.AppInventor.setWebViewString('GET_HISTORY');
@@ -1789,7 +1862,7 @@
                 }
 
                 var tries = 0;
-                var maxTries = 40;
+                var maxTries = 12;
                 var watcher = setInterval(function () {
                     tries += 1;
 
