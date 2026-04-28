@@ -552,6 +552,169 @@
             line-height: 1.45;
         }
 
+        .delete-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(19, 30, 20, 0.45);
+            backdrop-filter: blur(4px);
+        }
+
+        .delete-modal.is-open {
+            display: flex;
+            animation: deleteBackdropIn 180ms ease-out both;
+        }
+
+        .delete-modal.is-open .delete-dialog {
+            animation: deleteDialogIn 260ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+            transform-origin: 50% 100%;
+        }
+
+        @keyframes deleteBackdropIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes deleteDialogIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .delete-dialog {
+            width: min(100%, 420px);
+            max-height: calc(100dvh - 24px);
+            overflow-y: auto;
+            border-radius: 24px;
+            background: #ffffff;
+            border: 1px solid rgba(188, 203, 184, 0.4);
+            padding: 20px;
+        }
+
+        .delete-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .delete-title {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .delete-close-btn {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 50%;
+            background: #deecdc;
+            color: #3d4a3c;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+        }
+
+        .delete-message {
+            margin: 12px 0 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--color-on-surface-variant);
+        }
+
+        .delete-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .delete-btn {
+            flex: 1;
+            height: 52px;
+            border-radius: 999px;
+            border: 0;
+            font-size: 0.92rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.98);
+        }
+
+        .delete-btn-cancel {
+            background: #eaf7e7;
+            color: #006e28;
+        }
+
+        .delete-btn-danger {
+            background: linear-gradient(90deg, #b43531, #d84a43);
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(180, 53, 49, 0.24);
+        }
+
+        .history-loading .entry-card {
+            cursor: default;
+            border-color: rgba(188, 203, 184, 0.2);
+        }
+
+        .history-loading .entry-card:active {
+            transform: none;
+        }
+
+        .history-skeleton {
+            background: linear-gradient(90deg, #dfe7df 25%, #f5f9f5 37%, #dfe7df 63%);
+            background-size: 400% 100%;
+            animation: historyShimmer 2.3s ease-in-out infinite;
+        }
+
+        @keyframes historyShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .history-skeleton.avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+        }
+
+        .history-skeleton.line {
+            height: 12px;
+            border-radius: 999px;
+        }
+
+        .history-skeleton.line.short {
+            width: 120px;
+        }
+
+        .history-skeleton.line.medium {
+            width: 180px;
+        }
+
         @media (max-width: 420px) {
             .main-content {
                 padding-left: 24px;
@@ -609,10 +772,10 @@
         <!-- Selection Action Row -->
         <section class="selection-row">
             <label class="select-all">
-                <input class="section-checkbox" type="checkbox" />
+                <input id="selectAllCheckbox" class="section-checkbox" type="checkbox" />
                 <span class="select-text">Select All</span>
             </label>
-            <button class="delete-selected" type="button">
+            <button id="deleteSelectedBtn" class="delete-selected" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px"
                     fill=currentColor>
                     <path
@@ -622,194 +785,7 @@
             </button>
         </section>
         <!-- Chronological List -->
-        <div id="historySections" class="history-sections">
-            <!-- Today Section -->
-            <section>
-                <div class="day-heading">
-                    <h2 class="day-title">Today</h2>
-                    <span class="day-divider"></span>
-                </div>
-                <div class="entry-list">
-                    <!-- List Item: Healthy Monstera -->
-                    <div class="entry-card botanical-shadow">
-                        <input class="section-checkbox" type="checkbox" />
-                        <div class="entry-image-wrap">
-                            <img alt="Monstera Deliciosa" class="entry-image"
-                                data-alt="Close-up of a vibrant green Monstera Deliciosa leaf with natural window lighting in a minimalist setting"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl1hi0fm4WWqLT4b7JaDq8W9a3oPHwZh60BGHAjr31rNaAXe3DAMP5LCt2EmhQSDa7WbAl0UD-M3SBhPktovowUVoLv_PSr5oMgtnTj2W0B4BuVpZL4B6lrretUUp034VFAbW5JQEipDIVTLkLo2GVFLNo1maa_kgel5WXsJ82mZWbLuyOO1iL2sCF3lT6OKMtASvl9RxmA8U8zi2Jy5qBkCEZVrRJhuOpckd-NI4zBBgUze3OeRTVibnHs_MvIkLQY9_roeXc_BTW" />
-                        </div>
-                        <div class="entry-copy">
-                            <h3 class="entry-name">Monstera Deliciosa</h3>
-                            <div class="status-stack">
-                                <div class="status-row">
-                                    <div class="status-dot status-dot-healthy"></div>
-                                    <p class="status-text status-text-healthy">Healthy</p>
-                                </div>
-                                <p class="entry-time">10:30 AM</p>
-                            </div>
-                        </div>
-                        <div class="entry-actions">
-                            <button class="icon-button" type="button" aria-label="Delete item">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                    width="20px" fill=currentColor>
-                                    <path
-                                        d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                                </svg>
-                            </button>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron"
-                                viewBox="0 -960 960 960" width="24px" fill=currentColor>
-                                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- List Item: Tomato Plant Problem -->
-                    <div class="entry-card botanical-shadow">
-                        <input class="section-checkbox" type="checkbox" />
-                        <div class="entry-image-wrap">
-                            <img alt="Tomato Plant" class="entry-image"
-                                data-alt="Detail of a tomato plant leaf showing signs of white powdery spots with soft afternoon shadows"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO17OQc1CtFy9P8l2qrqe_JM2I0h8-HoNTxGVs6NT4vaOaRd3cV2Iu5Glbe2zpMZPzxUwvsl2wGVh6Jj2DnSY4EbYXDykynuMyQ5zv9ov5Q2_Lj-ajzHHkkuDwS48Xvh9VGYYUKq8Igyiicrk6NXTp1jeBRz3PHQ5lCqF5W4jWh_FaiXMUsu_QbmBUWDelQb4E7c_69N1b4Z5WTg33rpe7CWUoc6vM6YZaUQ8BdI1Dc80HMvTZgAmzPCL1iFsyzAiPaYhcbw4LxyEJ" />
-                        </div>
-                        <div class="entry-copy">
-                            <h3 class="entry-name">Tomato Plant</h3>
-                            <div class="status-stack">
-                                <div class="status-row">
-                                    <div class="status-dot status-dot-alert"></div>
-                                    <p class="status-text status-text-alert">Powdery Mildew</p>
-                                </div>
-                                <p class="entry-time">02:15 PM</p>
-                            </div>
-                        </div>
-                        <div class="entry-actions">
-                            <button class="icon-button" type="button" aria-label="Delete item">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                    width="20px" fill=currentColor>
-                                    <path
-                                        d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                                </svg>
-                            </button>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron"
-                                viewBox="0 -960 960 960" width="24px" fill=currentColor>
-                                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- Yesterday Section -->
-            <section>
-                <div class="day-heading">
-                    <h2 class="day-title">Yesterday</h2>
-                    <span class="day-divider"></span>
-                </div>
-                <div class="entry-list">
-                    <div class="entry-card botanical-shadow">
-                        <input class="section-checkbox" type="checkbox" />
-                        <div class="entry-image-wrap">
-                            <img alt="Echeveria" class="entry-image"
-                                data-alt="Top view of a succulent plant in a white pot with clean soft studio lighting"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4VIWk7qKl_YKOKppXIvqmgEYUTeW6Amk_dGWkH3IOHX4KyHN55N-fCvofs96XZpckwkEU2-wUitVoMe2WbuO8BZQySFauh-gukN5Uxu-CuMsbWnzMfw8_LQX0_X64ihD3bNP4PSOkKwfLqw6zcGKwHyam29vBuvw8hOMr2puvO6Py22T81EC0riSbtOW_4rabqJsMyrvKPfOh4EHCJfn1nXlRG3_W3r2x48QP_dFCI7C70f_UDxHKI1dfipLXnrkw8IUjlk7WPINv" />
-                        </div>
-                        <div class="entry-copy">
-                            <h3 class="entry-name">Echeveria</h3>
-                            <div class="status-stack">
-                                <div class="status-row">
-                                    <div class="status-dot status-dot-healthy"></div>
-                                    <p class="status-text status-text-healthy">Healthy</p>
-                                </div>
-                                <p class="entry-time">04:45 PM</p>
-                            </div>
-                        </div>
-                        <div class="entry-actions">
-                            <button class="icon-button" type="button" aria-label="Delete item">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                    width="20px" fill=currentColor>
-                                    <path
-                                        d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                                </svg>
-                            </button>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron"
-                                viewBox="0 -960 960 960" width="24px" fill=currentColor>
-                                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- Last Week Section -->
-            <section>
-                <div class="day-heading">
-                    <h2 class="day-title">Last Week</h2>
-                    <span class="day-divider"></span>
-                </div>
-                <div class="entry-list">
-                    <!-- Fiddle Leaf Fig -->
-                    <div class="entry-card botanical-shadow">
-                        <input class="section-checkbox" type="checkbox" />
-                        <div class="entry-image-wrap">
-                            <img alt="Fiddle Leaf Fig" class="entry-image"
-                                data-alt="Broad sculptural leaves of a Fiddle Leaf Fig catching dramatic side light in a modern home office"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuABJh-pMmDP69dWVuCWgNMzJi5ZFkXoMVEV3CselrvxPzFKU8-aK1_L9ppD33A88nqJC3QamELdK4ahQP5Ekj3Ovj4kfnIO0Pf4oZg3M77yOy6H0IUwvIl2D-BpSSE10uPin4DSl2ec8VYAwAtfVfmIAlfQusAuEr9KqBAvp1hqy4NdnxwYX6k20VQ_sR8xsEW5uzRtclhVM5p8s-ETdCEogMbC6dJEtqqLvSkqMCzhNLEcWs0QhghtwaPYJMfaXVl_km4-PGmyLGiI" />
-                        </div>
-                        <div class="entry-copy">
-                            <h3 class="entry-name">Fiddle Leaf Fig</h3>
-                            <div class="status-stack">
-                                <div class="status-row">
-                                    <div class="status-dot status-dot-healthy"></div>
-                                    <p class="status-text status-text-healthy">Healthy</p>
-                                </div>
-                                <p class="entry-time">11:15 AM</p>
-                            </div>
-                        </div>
-                        <div class="entry-actions">
-                            <button class="icon-button" type="button" aria-label="Delete item">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                    width="20px" fill=currentColor>
-                                    <path
-                                        d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                                </svg>
-                            </button>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron"
-                                viewBox="0 -960 960 960" width="24px" fill=currentColor>
-                                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <!-- Snake Plant -->
-                    <div class="entry-card botanical-shadow">
-                        <input class="section-checkbox" type="checkbox" />
-                        <div class="entry-image-wrap">
-                            <img alt="Snake Plant" class="entry-image"
-                                data-alt="Vertical architectural leaves of a snake plant against a clean neutral wall with bright daylight"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7b16wDNNI8NMe2tuboY4MjBaB4GKTJwXEw4XMSxpSFOf38JiAXt7rLo5ZkmFpBW0_WHJ3HppUezqaPiD7zSgYK74lAvbQuk1m-3VCfhLtPLvr0JwH5F0ndDIGmj5lJz--O5q0WlC2bvTrUPwZm4oXJRx-X_kwfeUPkCt1RrvD6DVAaXKlOAdNWY3UOOQg6S2yLrnqah8JwpT5_s2BtrVJAcuUoQP4yH78336T56Vn6jPJi9t67fsXXj3mMMqt7is0avi-SvVKRZri" />
-                        </div>
-                        <div class="entry-copy">
-                            <h3 class="entry-name">Snake Plant</h3>
-                            <div class="status-stack">
-                                <div class="status-row">
-                                    <div class="status-dot status-dot-alert"></div>
-                                    <p class="status-text status-text-alert">Rust Fungi</p>
-                                </div>
-                                <p class="entry-time">09:40 AM</p>
-                            </div>
-                        </div>
-                        <div class="entry-actions">
-                            <button class="icon-button" type="button" aria-label="Delete item">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                    width="20px" fill=currentColor>
-                                    <path
-                                        d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                                </svg>
-                            </button>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron"
-                                viewBox="0 -960 960 960" width="24px" fill=currentColor>
-                                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
+        <div id="historySections" class="history-sections"></div>
     </main>
     <!-- FAB for New Scan -->
     <button class="fab-button botanical-shadow" type="button" aria-label="New scan">
@@ -848,6 +824,26 @@
             <span class="nav-label">Library</span>
         </a>
     </nav>
+    <div id="deleteModal" class="delete-modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle"
+        aria-hidden="true">
+        <div class="delete-dialog botanical-shadow">
+            <div class="delete-header">
+                <h2 id="deleteTitle" class="delete-title">Delete Selected</h2>
+                <button id="deleteCloseBtn" class="delete-close-btn" type="button" aria-label="Close delete dialog">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px"
+                        fill="currentColor">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg>
+                </button>
+            </div>
+            <p id="deleteMessage" class="delete-message">This action cannot be undone.</p>
+            <div class="delete-actions">
+                <button id="deleteCancelBtn" class="delete-btn delete-btn-cancel" type="button">Cancel</button>
+                <button id="deleteConfirmBtn" class="delete-btn delete-btn-danger" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
     <script>
         (function () {
             var settingsToggle = document.getElementById('settingsToggle');
@@ -897,6 +893,14 @@
     <script>
         (function () {
             var historySections = document.getElementById('historySections');
+            var selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            var deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+            var deleteModal = document.getElementById('deleteModal');
+            var deleteCloseBtn = document.getElementById('deleteCloseBtn');
+            var deleteCancelBtn = document.getElementById('deleteCancelBtn');
+            var deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+            var deleteMessage = document.getElementById('deleteMessage');
+            var isBulkToggling = false;
             if (!historySections) {
                 return;
             }
@@ -1192,40 +1196,58 @@
 
                 return '' +
                     '<div class="entry-card botanical-shadow" data-id="' + escapeHtml(record.id) + '">' +
-                        '<input class="section-checkbox" type="checkbox" />' +
-                        '<div class="entry-image-wrap">' +
-                            '<img alt="' + label + '" class="entry-image" src="' + escapeHtml(imageSrc) + '" />' +
-                        '</div>' +
-                        '<div class="entry-copy">' +
-                            '<h3 class="entry-name">' + label + '</h3>' +
-                            '<div class="status-stack">' +
-                                '<div class="status-row">' +
-                                    '<div class="status-dot ' + status.dot + '"></div>' +
-                                    '<p class="status-text ' + status.text + '">' + statusValue + '</p>' +
-                                '</div>' +
-                                '<p class="entry-time">' + escapeHtml(timeLabel(record)) + '</p>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="entry-actions">' +
-                            '<button class="icon-button" type="button" aria-label="Delete item">' +
-                                '<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">' +
-                                    '<path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />' +
-                                '</svg>' +
-                            '</button>' +
-                            '<svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron" viewBox="0 -960 960 960" width="24px" fill="currentColor">' +
-                                '<path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />' +
-                            '</svg>' +
-                        '</div>' +
+                    '<input class="section-checkbox" type="checkbox" />' +
+                    '<div class="entry-image-wrap">' +
+                    '<img alt="' + label + '" class="entry-image" src="' + escapeHtml(imageSrc) + '" />' +
+                    '</div>' +
+                    '<div class="entry-copy">' +
+                    '<h3 class="entry-name">' + label + '</h3>' +
+                    '<div class="status-stack">' +
+                    '<div class="status-row">' +
+                    '<div class="status-dot ' + status.dot + '"></div>' +
+                    '<p class="status-text ' + status.text + '">' + statusValue + '</p>' +
+                    '</div>' +
+                    '<p class="entry-time">' + escapeHtml(timeLabel(record)) + '</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="entry-actions">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" height="24px" class="chevron" viewBox="0 -960 960 960" width="24px" fill="currentColor">' +
+                    '<path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />' +
+                    '</svg>' +
+                    '</div>' +
                     '</div>';
             }
 
             function renderEmptyState() {
                 historySections.innerHTML =
                     '<section>' +
-                        '<div class="history-empty botanical-shadow">' +
-                            '<h3>No Scan History Yet</h3>' +
-                            '<p>After your first successful scan, it will appear here automatically.</p>' +
+                    '<div class="history-empty botanical-shadow">' +
+                    '<h3>No Scan History Yet</h3>' +
+                    '<p>After your first successful scan, it will appear here automatically.</p>' +
+                    '</div>' +
+                    '</section>';
+            }
+
+            function renderLoadingState() {
+                var cards = '';
+                for (var i = 0; i < 3; i++) {
+                    cards += '' +
+                        '<div class="entry-card botanical-shadow">' +
+                        '<div class="history-skeleton avatar"></div>' +
+                        '<div class="entry-copy">' +
+                        '<div class="history-skeleton line medium"></div>' +
+                        '<div class="history-skeleton line short" style="margin-top:10px;"></div>' +
                         '</div>' +
+                        '</div>';
+                }
+
+                historySections.innerHTML =
+                    '<section class="history-loading">' +
+                    '<div class="day-heading">' +
+                    '<h2 class="day-title">Loading</h2>' +
+                    '<span class="day-divider"></span>' +
+                    '</div>' +
+                    '<div class="entry-list">' + cards + '</div>' +
                     '</section>';
             }
 
@@ -1263,15 +1285,154 @@
 
                     html +=
                         '<section>' +
-                            '<div class="day-heading">' +
-                                '<h2 class="day-title">' + escapeHtml(key) + '</h2>' +
-                                '<span class="day-divider"></span>' +
-                            '</div>' +
-                            '<div class="entry-list">' + cards + '</div>' +
+                        '<div class="day-heading">' +
+                        '<h2 class="day-title">' + escapeHtml(key) + '</h2>' +
+                        '<span class="day-divider"></span>' +
+                        '</div>' +
+                        '<div class="entry-list">' + cards + '</div>' +
                         '</section>';
                 }
 
                 historySections.innerHTML = html;
+                bindSelectionHandlers();
+            }
+
+            function getItemCheckboxes() {
+                return historySections.querySelectorAll('.entry-card .section-checkbox');
+            }
+
+            function getCheckedItems() {
+                return historySections.querySelectorAll('.entry-card .section-checkbox:checked');
+            }
+
+            function updateSelectAllState() {
+                if (!selectAllCheckbox) {
+                    return;
+                }
+
+                var boxes = getItemCheckboxes();
+                var checked = getCheckedItems();
+
+                if (!boxes.length) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                    return;
+                }
+
+                selectAllCheckbox.checked = checked.length === boxes.length;
+                selectAllCheckbox.indeterminate = checked.length > 0 && checked.length < boxes.length;
+            }
+
+            function updateDeleteButtonState() {
+                if (!deleteSelectedBtn) {
+                    return;
+                }
+
+                var checkedCount = getCheckedItems().length;
+                deleteSelectedBtn.disabled = checkedCount === 0;
+                deleteSelectedBtn.style.opacity = checkedCount === 0 ? '0.45' : '1';
+            }
+
+            function setAllCheckboxes(checked) {
+                var boxes = getItemCheckboxes();
+                isBulkToggling = true;
+                for (var i = 0; i < boxes.length; i++) {
+                    boxes[i].checked = checked;
+                }
+                isBulkToggling = false;
+                updateSelectAllState();
+                updateDeleteButtonState();
+            }
+
+            function openDeleteModal() {
+                if (!deleteModal) {
+                    return;
+                }
+
+                var count = getCheckedItems().length;
+                if (count === 0) {
+                    return;
+                }
+
+                if (deleteMessage) {
+                    deleteMessage.textContent = 'Delete ' + count + ' selected ' + (count === 1 ? 'item' : 'items') + '? This action cannot be undone.';
+                }
+
+                deleteModal.classList.add('is-open');
+                deleteModal.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeDeleteModal() {
+                if (!deleteModal) {
+                    return;
+                }
+
+                deleteModal.classList.remove('is-open');
+                deleteModal.setAttribute('aria-hidden', 'true');
+            }
+
+            function deleteSelectedItems() {
+                var checkedBoxes = Array.prototype.slice.call(getCheckedItems());
+                if (!checkedBoxes.length) {
+                    closeDeleteModal();
+                    return;
+                }
+
+                var removedIds = [];
+                checkedBoxes.forEach(function (box) {
+                    var card = box.closest('.entry-card');
+                    if (!card) {
+                        return;
+                    }
+
+                    var id = card.getAttribute('data-id');
+                    if (id) {
+                        removedIds.push(id);
+                    }
+
+                    card.remove();
+                });
+
+                var sections = historySections.querySelectorAll('section');
+                for (var i = 0; i < sections.length; i++) {
+                    var list = sections[i].querySelector('.entry-list');
+                    if (list && list.children.length === 0) {
+                        sections[i].remove();
+                    }
+                }
+
+                if (window.AppInventor && removedIds.length) {
+                    try {
+                        window.AppInventor.setWebViewString('DELETE_HISTORY|' + JSON.stringify(removedIds));
+                    } catch (e) {
+                        // Ignore bridge failure.
+                    }
+                }
+
+                if (!historySections.querySelector('.entry-card')) {
+                    renderEmptyState();
+                } else {
+                    updateSelectAllState();
+                    updateDeleteButtonState();
+                }
+
+                closeDeleteModal();
+            }
+
+            function bindSelectionHandlers() {
+                var boxes = getItemCheckboxes();
+                for (var i = 0; i < boxes.length; i++) {
+                    boxes[i].addEventListener('change', function () {
+                        if (isBulkToggling) {
+                            return;
+                        }
+                        updateSelectAllState();
+                        updateDeleteButtonState();
+                    });
+                }
+
+                updateSelectAllState();
+                updateDeleteButtonState();
             }
 
             function maybeConsumeBridgeHistory(raw) {
@@ -1298,6 +1459,8 @@
                     renderEmptyState();
                     return;
                 }
+
+                renderLoadingState();
 
                 try {
                     window.AppInventor.setWebViewString('GET_HISTORY');
@@ -1336,6 +1499,28 @@
             }
 
             requestHistoryFromBridge();
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    setAllCheckboxes(selectAllCheckbox.checked);
+                });
+            }
+
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', openDeleteModal);
+            }
+
+            if (deleteCloseBtn) {
+                deleteCloseBtn.addEventListener('click', closeDeleteModal);
+            }
+
+            if (deleteCancelBtn) {
+                deleteCancelBtn.addEventListener('click', closeDeleteModal);
+            }
+
+            if (deleteConfirmBtn) {
+                deleteConfirmBtn.addEventListener('click', deleteSelectedItems);
+            }
         })();
     </script>
 </body>

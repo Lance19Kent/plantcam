@@ -1328,32 +1328,65 @@
                             historySaveSent = true;
                             return;
                         }
-                    } catch (e) {
-                        // Continue even if storage is unavailable.
-                    }
+                    } catch (e) { }
 
                     var dateSource = result.scannedAt ? new Date(result.scannedAt) : new Date();
-                    var historyItem = {
-                        id: historyId,
-                        label: result.label,
-                        confidence: result.confidence,
-                        date: isNaN(dateSource.getTime()) ? new Date().toLocaleDateString() : dateSource.toLocaleDateString(),
-                        scannedAt: result.scannedAt || new Date().toISOString(),
-                        image: result.previewImage,
-                        recommendation: recommendationData || null
-                    };
 
-                    historySaveSent = true;
+                    // FUNCTION PARA IPADALA SA BRIDGE
+                    function sendToBridge(compressedImage) {
+                        var historyItem = {
+                            id: historyId,
+                            label: result.label,
+                            confidence: result.confidence,
+                            date: isNaN(dateSource.getTime()) ? new Date().toLocaleDateString() : dateSource.toLocaleDateString(),
+                            scannedAt: result.scannedAt || new Date().toISOString(),
+                            image: compressedImage, // Ito na yung compressed thumbnail
+                            recommendation: recommendationData || null
+                        };
 
-                    try {
-                        localStorage.setItem(markerKey, '1');
-                    } catch (e) {
-                        // Continue even if storage is unavailable.
+                        historySaveSent = true;
+                        try { localStorage.setItem(markerKey, '1'); } catch (e) { }
+
+                        window.AppInventor.setWebViewString('SAVE_HISTORY|' + JSON.stringify(historyItem));
                     }
 
-                    window.AppInventor.setWebViewString('SAVE_HISTORY|' + JSON.stringify(historyItem));
-                }
+                    // KUNG WALANG IMAGE, SEND AGAD
+                    if (!result.previewImage) {
+                        sendToBridge('');
+                        return;
+                    }
 
+                    // IMAGE COMPRESSOR LOGIC
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var MAX_SIZE = 500; // Thumbnail size in pixels
+                        var width = img.width;
+                        var height = img.height;
+
+                        // Calculate aspect ratio
+                        if (width > height) {
+                            if (width > MAX_SIZE) {
+                                height *= MAX_SIZE / width;
+                                width = MAX_SIZE;
+                            }
+                        } else {
+                            if (height > MAX_SIZE) {
+                                width *= MAX_SIZE / height;
+                                height = MAX_SIZE;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        var tinyImage = canvas.toDataURL('image/jpeg', 0.7);
+                        sendToBridge(tinyImage);
+                    };
+                    img.src = result.previewImage;
+                }
                 function applyRecommendationData(recommendation) {
                     if (!recommendation || !recommendation.data) {
                         return;
@@ -1528,6 +1561,16 @@
 
                     var fallbackData = getFallbackByLabel(result.label || diseaseLabel);
                     var nonPlantResult = isNonPlantDiagnosis(result.label || diseaseLabel);
+
+                    if (result.savedRecommendation) {
+                        applyRecommendationData({
+                            source: 'history',
+                            data: result.savedRecommendation,
+                            reason: 'Loaded from scan history.'
+                        });
+                        // Wag na mag-loading state
+                        recommendationSourceState = 'history';
+                    }
 
                     if (nonPlantResult) {
                         recommendationSourceState = 'guide';
