@@ -240,7 +240,7 @@
 
         .filter-status {
             margin-top: -20px;
-            padding: 0 12px 12px 0;
+            padding: 0 12px 28px 0;
             font-size: 0.8rem;
             font-weight: 600;
             color: rgba(61, 74, 60, 0.7);
@@ -1470,6 +1470,8 @@
             var dialogConfirmHandler = null;
             var dialogCloseTimer = null;
             var isBulkToggling = false;
+            var detailNavigationBound = false;
+            var DETAIL_STORAGE_KEY = 'plantcam_history_detail';
             if (!historySections) {
                 return;
             }
@@ -2016,6 +2018,7 @@
 
                 historySections.innerHTML = html;
                 bindSelectionHandlers();
+                bindEntryNavigation();
             }
 
             var historyRecords = [];
@@ -2371,6 +2374,78 @@
 
                 updateSelectAllState();
                 updateDeleteButtonState();
+            }
+
+            function storeDetailRecord(record) {
+                if (!record) {
+                    return;
+                }
+
+                var payload = '';
+                try {
+                    payload = JSON.stringify(record);
+                } catch (e) {
+                    payload = '';
+                }
+
+                if (!payload) {
+                    return;
+                }
+
+                try {
+                    sessionStorage.setItem(DETAIL_STORAGE_KEY, payload);
+                } catch (e) {
+                    // Ignore session storage failure.
+                }
+
+                try {
+                    localStorage.setItem(DETAIL_STORAGE_KEY, payload);
+                } catch (e) {
+                    // Ignore local storage failure.
+                }
+            }
+
+            function bindEntryNavigation() {
+                if (detailNavigationBound || !historySections) {
+                    return;
+                }
+
+                detailNavigationBound = true;
+                historySections.addEventListener('click', function (event) {
+                    var target = event.target;
+                    if (!target) {
+                        return;
+                    }
+
+                    if (target.closest && target.closest('.section-checkbox')) {
+                        return;
+                    }
+
+                    var card = target.closest ? target.closest('.entry-card') : null;
+                    if (!card) {
+                        return;
+                    }
+
+                    var id = card.getAttribute('data-id');
+                    if (!id) {
+                        return;
+                    }
+
+                    var record = null;
+                    for (var i = 0; i < historyRecords.length; i++) {
+                        if (String(historyRecords[i].id) === String(id)) {
+                            record = historyRecords[i];
+                            break;
+                        }
+                    }
+
+                    if (!record) {
+                        return;
+                    }
+
+                    storeDetailRecord(record);
+                    window.location.href = 'plant-detail.html';
+                });
             }
 
             function maybeConsumeBridgeHistory(raw) {
